@@ -1,0 +1,11 @@
+{
+  "name": "collabityserver",
+  "version": "1.0.0",
+  "description": "the server of the collabity app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
