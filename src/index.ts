@@ -6,10 +6,10 @@ import bcrypt from 'bcrypt';
 
 import userModel from './models/user';
 
-mongoose.connect('mongodb://localhost:27017/collabity', { useNewUrlParser: true,  useUnifiedTopology: true } );
+mongoose.connect('mongodb://127.0.0.1:27017/collabity', { useNewUrlParser: true,  useUnifiedTopology: true } );
 
 const app : Express = express();
-const port : number = 3000;
+const port : number = 3000 || (process.env.PORT as unknown) as number;
 const saltRounds : number = 10;
 
 const jsonParser = bodyParser.json();
@@ -67,17 +67,12 @@ app.post('/register', async (req : Request, res: Response) => {
 });
 
 app.post('/login', async (req : Request, res: Response) => {
-    if (!req.body.password || (!req.body.username && !req.body.email)) {
+    if (!req.body.password || !req.body.email) {
         res.status(400)
         res.end('Invalid info.');
         return;
     }
-    let validLogin: boolean;
-    // login by email
-    if (req.body.email)
-        validLogin = await loginEmail(req.body.email, req.body.password);
-    else
-        validLogin = await loginUsername(req.body.username, req.body.password);
+    let validLogin: boolean = await loginEmail(req.body.email, req.body.password);
     
     if (validLogin) {
         res.status(200)
@@ -113,19 +108,6 @@ async function isEmailTaken(email: string): Promise<boolean> {
                 reject('There was an error determining if an email is taken')
             else
                 resolve(res !== null);
-        });
-    });
-}
-
-async function loginUsername(username: string, password: string): Promise<boolean> {
-    return new Promise<boolean>(async (resolve, reject) => {
-        userModel.findOne({ username }, (err, res : mongoose.Document) => {
-            if (err)
-                reject('There was an error finding a user')
-            else if (res === null)
-                resolve(false);
-            else
-                resolve(bcrypt.compareSync(password, res.get('password')));
         });
     });
 }
