@@ -8,7 +8,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc"
   },
-  "author": "",
+  "author": "Kobe and Jude",
   "license": "ISC",
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
