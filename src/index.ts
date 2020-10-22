@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 
 import userModel from './models/user';
 
-mongoose.connect('mongodb://localhost:27017/collabity', { useNewUrlParser: true,  useUnifiedTopology: true } );
+mongoose.connect('mongodb://127.0.0.1:27017/collabity', { useNewUrlParser: true,  useUnifiedTopology: true } );
 
 const app : Express = express();
 const port : number = 3000;
