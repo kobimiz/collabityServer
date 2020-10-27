@@ -19,50 +19,54 @@ app.use(jsonParser);
 app.use(urlencodedParser);
 
 app.post('/register', async (req : Request, res: Response) => {
-    if (!req.body.username) {
+    if (!req.body.info.username) {
         res.status(400)
+        console.log('Username must be 6 characters long.');
         res.end('Username must be 6 characters long.');
         return;
     }
-    if (!req.body.password) {
+    if (!req.body.info.password) {
         res.status(400)
+        console.log('Password must be 6 characters long.');
         res.end('Password must be 6 characters long.');
         return;
     }
-    if (!req.body.email || !emailValidator.validate(req.body.email)) {
+    if (!req.body.info.email || !emailValidator.validate(req.body.info.email)) {
         res.status(400)
+        console.log('Email not valid.');
         res.end('Email not valid.');
         return;
     }
 
-    const usernameTaken = await isUsernameTaken(req.body.username);
+    const usernameTaken = await isUsernameTaken(req.body.info.username);
     if (usernameTaken) {
         res.status(400)
         res.end('Username already taken.');
         return;
     }
 
-    const emailTaken = await isEmailTaken(req.body.email);
+    const emailTaken = await isEmailTaken(req.body.info.email);
     if (emailTaken) {
         res.status(400)
         res.end('Email already taken.');
         return;
     }
 
-    bcrypt.hash(req.body.password, saltRounds, (err, encrypted) => {
+    bcrypt.hash(req.body.info.password, saltRounds, (err, encrypted) => {
         if (err) {
             res.status(400)
             res.end('There was an error encrypting the password.');
             return;
         }
         const newUser = new userModel({
-            username: req.body.username,
-            email: req.body.email,
+            username: req.body.info.username,
+            email: req.body.info.email,
             password: encrypted
         });
         newUser.save();
         res.status(200)
-        res.end('Success.');
+        console.log('Successfully registered')
+        res.end('Success');
     });
 });
 
@@ -81,6 +85,7 @@ app.post('/login', async (req : Request, res: Response) => {
     
     if (validLogin) {
         res.status(200)
+        console.log('Successfully logged in')
         res.end('Success.');
         return;
     }
