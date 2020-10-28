@@ -55,9 +55,9 @@ app.post('/register', async (req : Request, res: Response) => {
     // to the user in the UI which one exactly is taken indeed.
     if(usernameTaken || emailTaken){
         res.status(400);
-        res.send({
-            "isUsernameTaken": usernameTaken,
-            "isEmailTaken": emailTaken
+        res.json({
+            isUsernameTaken: usernameTaken,
+            isEmailTaken: emailTaken
         });
         res.end('Fail');
         return;
