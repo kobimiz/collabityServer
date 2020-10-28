@@ -21,34 +21,45 @@ app.use(urlencodedParser);
 app.post('/register', async (req : Request, res: Response) => {
     if (!req.body.info.username) {
         res.status(400)
-        console.log('Username must be 6 characters long.');
-        res.end('Username must be 6 characters long.');
+        console.log('Username must be at least 3 characters long.');
+        res.end('Username must be at least 3 characters long.');
         return;
     }
     if (!req.body.info.password) {
         res.status(400)
-        console.log('Password must be 6 characters long.');
-        res.end('Password must be 6 characters long.');
+        console.log('Password must be at least 6 characters.');
+        res.end('Password must be at least 6 characters.');
         return;
     }
     if (!req.body.info.email || !emailValidator.validate(req.body.info.email)) {
         res.status(400)
-        console.log('Email not valid.');
-        res.end('Email not valid.');
+        console.log('Email is not valid.');
+        res.end('Email is not valid.');
         return;
     }
 
     const usernameTaken = await isUsernameTaken(req.body.info.username);
-    if (usernameTaken) {
-        res.status(400)
-        res.end('Username already taken.');
-        return;
-    }
+    // if (usernameTaken) {
+    //     res.status(400)
+    //     res.end('Username already taken.');
+    //     return;
+    // }
 
     const emailTaken = await isEmailTaken(req.body.info.email);
-    if (emailTaken) {
-        res.status(400)
-        res.end('Email already taken.');
+    // if (emailTaken) {
+    //     res.status(400)
+    //     res.end('Email already taken.');
+    //     return;
+    // }
+    //SOLVED: two seperate vars for determining if either username or email is taken so that way I (Jude) can display
+    // to the user in the UI which one exactly is taken indeed.
+    if(usernameTaken || emailTaken){
+        res.status(400);
+        res.send({
+            "isUsernameTaken": usernameTaken,
+            "isEmailTaken": emailTaken
+        });
+        res.end('Fail');
         return;
     }
 
@@ -99,7 +110,9 @@ app.listen(port, () => {
 });
 
 
-// TODO make this one function
+// TODO make this one function : Jude changes - review my interpretation of this TODO, if everything
+// is good, please delete this comment.
+//view line 55-62
 async function isUsernameTaken(username: string): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         userModel.findOne({ username }, (err, res) => {
@@ -115,7 +128,7 @@ async function isEmailTaken(email: string): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         userModel.findOne({ email }, (err, res) => {
             if (err)
-                reject('There was an error determining if an email is taken')
+                reject('There was an error determining if an email is taken');
             else
                 resolve(res !== null);
         });
